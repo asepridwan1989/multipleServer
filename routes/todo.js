@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const {getList, addTask, editTask, searchTask, deleteTask, showComplete, showUncomplete} = require('../controllers/todo.controller')
-const {auth} = require('../middleware/auth')
+const {auth} = require('../middlewares/auth')
 router
     .post('/', auth, addTask)
     .get('/', auth, getList)

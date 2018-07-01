@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user.model')
 
 
-module.exports = {
+var self = module.exports = {
     signUp: (req, res)=>{
         let name = req.body.name
         let email = req.body.email
@@ -38,8 +38,9 @@ module.exports = {
     },
 
     signIn: (req, res)=>{
-        let email = req.body.email
-        let password = req.body.password
+      console.log(req.body)
+      let email = req.body.email
+      let password = req.body.password
         User.findOne({
             email
         },(err, dataUser)=>{
@@ -72,5 +73,79 @@ module.exports = {
                 }
             }
         })
+    },
+
+    signInFB: (req, res, next)=>{
+      let name = req.body.name
+      let email = req.body.email
+      let password = req.body.password
+      User.findOne({
+          email
+      },(err, dataUser)=>{
+        if(err){
+          res.status(400).json({
+            message:err
+          })
+        }else{
+          if(!dataUser){
+            let user = new User({
+              name, email, password
+            })
+            user.save((err,result)=>{
+              let token = jwt.sign({
+                  id: result._id,
+                  email: result.email
+              }, process.env.TOKENKEY)
+              res.status(200).json({
+                  message: 'successfuly logged in',
+                  token:token,
+                  dataUser:result
+              })
+            })
+          }else {
+            next()
+          }
+        }
+      })
+    },
+    LoginSteam(req, res, next){
+      let steamID = req.user.steamid
+      let name = req.user.username
+      let email = `${steamID}@steam.com`
+      let password = steamID + name
+      User.findOne({
+          email
+      },(err, dataUser)=>{
+        if(err){
+          res.status(400).json({
+            message:err
+          })
+        }else{
+          if(!dataUser){
+            let user = new User({
+              name, email, password
+            })
+            user.save((err,result)=>{
+              let token = jwt.sign({
+                  id: result._id,
+                  email: result.email
+              }, process.env.TOKENKEY)
+              res.status(200).json({
+                  message: 'successfuly logged in',
+                  token:token,
+                  dataUser:result
+              })
+            })
+          }else {
+            let payload = {
+              body:{
+                email,
+                password
+              }
+            }
+            self.signIn(payload)
+          }
+        }
+      })
     }
 }
