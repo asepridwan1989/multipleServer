@@ -33,11 +33,13 @@ module.exports = {
     addArticle: (req, res)=>{
         const token = req.headers.token
         let verified = jwt.decode(token,process.env.TOKENKEY)
-        const userId = verified.id
+        let userId = verified.id
+        const username = req.body.username
         const title = req.body.title
         const content = req.body.content
         let newArticle = new Article({
             userId,
+            username,
             title,
             content
         })
@@ -159,9 +161,8 @@ module.exports = {
         })
     },
     getListAll: (req, res)=>{
-        console.log('masuk home')
         Article.find()
-        .populate('userId', 'username')
+        .populate('userId')
         .then(article=>{
           console.log(article)
           if(article.length > 0){
@@ -182,5 +183,22 @@ module.exports = {
             })
         })
     },
-
+    getOneArticle: (req, res)=>{
+        let id = mongoose.Types.ObjectId(req.params.id)
+        Article.findOne({_id:id})
+        .populate('userId')
+        .then(article=>{
+          console.log('article = = = ', article)
+          res.status(200).json({
+              message: 'successfuly got data',
+              data: article
+          })
+        })
+        .catch(err=>{
+            console.log('error', err)
+            res.status(403).json({
+                message: 'invalid user'
+            })
+        })
+    },
 }
