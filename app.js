@@ -9,6 +9,7 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/user');
 const todoRouter = require('./routes/todo');
 const article = require('./routes/article')
+const question = require('./routes/question')
 
 const mongoose = require('mongoose')
 const app = express();
@@ -17,7 +18,7 @@ const steam = require('./middlewares/steam_auth');
 require('dotenv').config()
 const userdb = process.env.USERDB
 const passdb = process.env.PASSDB
-mongodb://<dbuser>:<dbpassword>@ds217921.mlab.com:17921/portofolioserver
+
 mongoose.connect(`mongodb://${userdb}:${passdb}@ds217921.mlab.com:17921/portofolioserver`, (err) => {
   if(err) {
     console.log(`failed to connect database`)
@@ -52,6 +53,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/todo', todoRouter);
 app.use('/articles', article);
+app.use('/questions', question);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
