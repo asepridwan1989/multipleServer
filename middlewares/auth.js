@@ -4,6 +4,7 @@ module.exports = {
     auth: function(req, res, next) {
       console.log('body==============>>>>',req.body)
         let token = req.headers.token
+        console.log(token)
         if (token) {
             let verified = jwt.verify(token, process.env.TOKENKEY)
             if(verified) {

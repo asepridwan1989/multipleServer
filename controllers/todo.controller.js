@@ -61,7 +61,7 @@ module.exports = {
         const completeStat = req.body.completeStat
         Todo.findById(id, (err, todo) => {
           if(err) {
-            res.status(400).send({
+            res.status(400).json({
               message: err.message
             })
           } else {
@@ -74,18 +74,18 @@ module.exports = {
                 overwrite: false
               }, (err, result) => {
                 if(err) {
-                  res.status(400).send({
+                  res.status(400).json({
                     message: 'failed to edit task'
                   })
                 } else {
-                  res.status(201).send({
+                  res.status(201).json({
                     message: 'successfuly edited task',
                     data: todo
                   })
                 }
               })
             } else {
-              res.status(400).send({
+              res.status(400).json({
                 message: 'Invalid user'
               })
             }
@@ -101,7 +101,7 @@ module.exports = {
 
         Todo.findById(id, (err, todo) => {
             if(err) {
-                res.status(400).send({
+                res.status(400).json({
                     message: 'task not found'
                 })
             } else {
@@ -110,18 +110,18 @@ module.exports = {
                         _id: id
                     }, (err) => {
                         if(err) {
-                            res.status(400).send({
+                            res.status(400).json({
                                 message: 'failed to delete task'
                             })
                         } else {
-                            res.status(200).send({
+                            res.status(200).json({
                                 message: 'task was successfuly deleted',
                                 data: todo
                             })
                         }
                     })
                 } else {
-                    res.status(400).send({
+                    res.status(400).json({
                         message: 'Invalid user'
                     })
                 }
@@ -141,17 +141,17 @@ module.exports = {
             }
         },(err,todo)=>{
             if(err){
-                res.status(400).send({
+                res.status(400).json({
                     message: 'failed to get task'
                 })
             }else {
                 if(todo.length > 0){
-                    res.status(200).send({
+                    res.status(200).json({
                         message: 'task was succesfuly got',
                         data: todo
                     })
                 }else{
-                    res.status(200).send({
+                    res.status(200).json({
                         message: 'nothing to show'
                     })
                 }

@@ -66,7 +66,7 @@ module.exports = {
         const content = req.body.content
         Article.findById(id, (err, article) => {
           if(err) {
-            res.status(400).send({
+            res.status(400).json({
               message: err.message
             })
           } else {
@@ -79,18 +79,18 @@ module.exports = {
                 overwrite: false
               }, (err, result) => {
                 if(err) {
-                  res.status(400).send({
+                  res.status(400).json({
                     message: 'failed to edit article'
                   })
                 } else {
-                  res.status(201).send({
+                  res.status(201).json({
                     message: 'successfuly edited article',
                     data: result
                   })
                 }
               })
             } else {
-              res.status(400).send({
+              res.status(400).json({
                 message: 'Invalid user'
               })
             }
@@ -106,7 +106,7 @@ module.exports = {
 
         Article.findById(id, (err, article) => {
             if(err) {
-                res.status(400).send({
+                res.status(400).json({
                     message: 'article not found'
                 })
             } else {
@@ -115,18 +115,18 @@ module.exports = {
                         _id: id
                     }, (err) => {
                         if(err) {
-                            res.status(400).send({
+                            res.status(400).json({
                                 message: 'failed to delete article'
                             })
                         } else {
-                            res.status(200).send({
+                            res.status(200).json({
                                 message: 'article was successfuly deleted',
                                 data: article
                             })
                         }
                     })
                 } else {
-                    res.status(400).send({
+                    res.status(400).json({
                         message: 'Invalid user'
                     })
                 }
@@ -143,23 +143,24 @@ module.exports = {
             }
         },(err,article)=>{
             if(err){
-                res.status(400).send({
-                    message: 'failed to get task'
+                res.status(400).json({
+                    message: 'failed to get article'
                 })
             }else {
                 if(article.length > 0){
-                    res.status(200).send({
+                    res.status(200).json({
                         message: 'article was succesfuly got',
                         data: article
                     })
                 }else{
-                    res.status(200).send({
+                    res.status(200).json({
                         message: 'nothing to show'
                     })
                 }
             }
         })
     },
+
     getListAll: (req, res)=>{
         Article.find()
         .populate('userId')
@@ -183,8 +184,10 @@ module.exports = {
             })
         })
     },
+
     getOneArticle: (req, res)=>{
         let id = mongoose.Types.ObjectId(req.params.id)
+        console.log('article = = = ', req.params.id)
         Article.findOne({_id:id})
         .populate('userId')
         .then(article=>{
@@ -200,5 +203,69 @@ module.exports = {
                 message: 'invalid user'
             })
         })
+    },
+
+  addComment: (req, res)=>{
+    console.log(req.body)
+    const token = req.headers.token
+    const user = req.body.user
+    const id = req.params.id
+    const comment = req.body.comment
+    const newComment = {
+      user,
+      comment
+    }
+    console.log('baruuuu',newComment)
+    Article.findByIdAndUpdate(id, {
+      $push: {
+        comments: newComment
+      }
+    })
+    .then(response => {
+      res.status(200).json({
+        message: 'Add comment to post success',
+        data: response
+      })
+    })
+    .catch(err => {
+      res.status(400).json({
+        message: 'Add comment to post failed',
+        err: err.message
+      })
+    })
+  },
+
+  addLike: (req, res) => {
+      const id = mongoose.Types.ObjectId(req.params.id)
+      const like = req.body.like
+      console.log('likeeee',id,like)
+      Article.findById(id, (err, article) => {
+        if(err) {
+          console.log(err)
+          res.status(400).json({
+            message: err.message
+          })
+        } else {
+          console.log('sini mah udah')
+            Article.update({
+              _id: id
+            }, {
+              $set: {like}
+            }, {
+              overwrite: false
+            }, (err, result) => {
+              if(err) {
+                res.status(400).json({
+                  message: 'failed to edit article'
+                })
+              } else {
+                res.status(201).json({
+                  message: 'successfuly edited article',
+                  data: result
+                })
+              }
+            })
+        }
+      })
     },
 }
